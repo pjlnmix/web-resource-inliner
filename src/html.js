@@ -86,7 +86,14 @@ module.exports = function( options, callback )
 
                 var cssOptions = xtend( {}, settings, {
                     fileContent: content.toString(),
-                    rebaseRelativeTo: path.relative( settings.relativeTo, settings.rebaseRelativeTo || path.join( settings.relativeTo, args.src, ".." + path.sep ) )
+                    rebaseRelativeTo: path.relative(
+                        settings.relativeTo,
+                        settings.rebaseRelativeTo || (
+                            inline.isRemotePath( args.src )
+                                ? path.join( args.src, ".." + path.sep )
+                                : path.join( settings.relativeTo, args.src, ".." + path.sep )
+                        )
+                    )
                 } );
 
                 css( cssOptions, function( err, content )
@@ -189,17 +196,13 @@ module.exports = function( options, callback )
         if( !inlineAttributeIgnoreRegex.test( found[ 0 ] ) &&
             ( settings.scripts || inlineAttributeRegex.test( found[ 0 ] ) ) )
         {
-            var src = unescape( found[ 2 ] ).trim();
-            if (src)
+            tasks.push( replaceScript.bind(
             {
-                tasks.push( replaceScript.bind(
-                {
-                    element: found[ 0 ],
-                    src: src,
-                    attrs: inline.getAttrs( found[ 0 ], settings ),
-                    limit: settings.scripts
-                } ) );
-            }
+                element: found[ 0 ],
+                src: unescape( found[ 2 ] ).trim(),
+                attrs: inline.getAttrs( found[ 0 ], settings ),
+                limit: settings.scripts
+            } ) );
         }
     }
 
@@ -210,17 +213,13 @@ module.exports = function( options, callback )
             relStylesheetAttributeIgnoreRegex.test( found[ 0 ] ) &&
             ( settings.links || inlineAttributeRegex.test( found[ 0 ] ) ) )
         {
-            var src = unescape( found[ 2 ] ).trim();
-            if (src)
+            tasks.push( replaceLink.bind(
             {
-                tasks.push( replaceLink.bind(
-                {
-                    element: found[ 0 ],
-                    src: src,
-                    attrs: inline.getAttrs( found[ 0 ], settings ),
-                    limit: settings.links
-                } ) );
-            }
+                element: found[ 0 ],
+                src: unescape( found[ 2 ] ).trim(),
+                attrs: inline.getAttrs( found[ 0 ], settings ),
+                limit: settings.links
+            } ) );
         }
     }
 
@@ -230,16 +229,13 @@ module.exports = function( options, callback )
         if( !inlineAttributeIgnoreRegex.test( found[ 0 ] ) &&
             ( settings.images || inlineAttributeRegex.test( found[ 0 ] ) ) )
         {
-            var src = unescape( found[ 2 ] ).trim();
-            if (src) {
-                tasks.push( replaceImg.bind(
-                {
-                    element: found[ 0 ],
-                    src: src,
-                    attrs: inline.getAttrs( found[ 0 ], settings ),
-                    limit: settings.images
-                } ) );
-            }
+            tasks.push( replaceImg.bind(
+            {
+                element: found[ 0 ],
+                src: unescape( found[ 2 ] ).trim(),
+                attrs: inline.getAttrs( found[ 0 ], settings ),
+                limit: settings.images
+            } ) );
         }
     }
 
