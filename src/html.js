@@ -104,7 +104,7 @@ module.exports = function( options, callback )
                     }
                     var html = content.toString();
                     html = html.replace( /<\/script>/gmi, "<\\/script>" );
-                    html = "<style" + ( args.attrs ? " " + args.attrs : "" ) + ">\n" + html.replace( /\/\*[\s]*--[\s]*>*/gm, "/* - ->" ) + "\n</style>";
+                    html = "<style data-original-source='" + args.src + "'" + ( args.attrs ? " " + args.attrs : "" ) + ">\n" + html.replace( /\/\*[\s]*--[\s]*>*/gm, "/* - ->" ) + "\n</style>";
                     var re = new RegExp( inline.escapeSpecialChars( args.element ), "g" );
                     result = result.replace( re, () => html );
                     return callback( null );
@@ -135,7 +135,7 @@ module.exports = function( options, callback )
             {
                 return callback( null );
             }
-            var html = "<img" + ( args.attrs ? " " + args.attrs : "" ) + " src=\"" + datauriContent + "\" />";
+            var html = "<img data-original-source='" + args.src + "'" + ( args.attrs ? " " + args.attrs : "" ) + " src=\"" + datauriContent + "\" />";
             var re = new RegExp( inline.escapeSpecialChars( args.element ), "g" );
             result = result.replace( re, () => html );
             return callback( null );
